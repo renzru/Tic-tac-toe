@@ -7,36 +7,54 @@ const Board = () => {
 }
 
 const Player = (sign) => {
-    const getSign = () => {
-        return sign;
-    }
-
     return {
-        getSign
+        sign
     }
 };
 
 const Game = () => {
-    const playerX = Player('X');
-    const playerO = Player('O');
+    playerX = Player('X');
+    playerO = Player('O');
 
     const playRound = () => {
-
+        return;
     }
 
+    const selectSign = () => {
+
+    }
     return {
         playerX,
-        playerO,
-        message
+        playerO
     };
 }
 
 const Display = () => {
-    let game = gameBoard();
+    let game = Board();
+    let round = 1;
+    const players = Game();
+    const player1 = players.playerX;
+    const player2 = players.playerO;
 
-    const updateDisplay = () => {
-        display.innerHTML = game.board;
-        console.log('updateDisplay executed');
+    const gameTile = document.querySelectorAll('.tile');
+    const optionX = document.querySelector('.optionX');
+    const optionO = document.querySelector('.optionO');
+
+    optionX.onclick = () => {}
+
+    gameTile.forEach((tile, index) => {
+        tile.addEventListener('click', () => updateDisplay(tile, getCurrentPlayer(), index));
+    })
+
+    const getCurrentPlayer = () => {
+        if (round % 2 === 1) return player1.sign;
+        else return player2.sign;
+    }
+    const updateDisplay = (tile, sign, index) => {
+        tile.innerHTML = sign;
+        game.matrix[index] = sign;
+        round++;
+        console.log(game.matrix);
     }
 }
 
