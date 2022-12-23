@@ -3,59 +3,58 @@ const Board = () => {
 
     return {
         matrix
-    };
+    }
 }
 
-const Player = (sign) => {
-    return {
-        sign
+const Players = () => {
+    const playerX = getSign('X');
+    const playerO = getSign('O');
+
+    function currentPlayer(a, b, c) {
+        return (a % 2 === 1) ? b : c;
     }
-};
+
+    function getSign(sign) {
+        return sign;
+    }
+
+    return {
+        getSign,
+        playerX,
+        playerO,
+        currentPlayer,
+    }
+}
 
 const Game = () => {
-    playerX = Player('X');
-    playerO = Player('O');
-
-    const playRound = () => {
-        return;
-    }
-
-    const selectSign = () => {
-
-    }
-    return {
-        playerX,
-        playerO
-    };
-}
-
-const Display = () => {
     let game = Board();
     let round = 1;
-    const players = Game();
-    const player1 = players.playerX;
-    const player2 = players.playerO;
+    const playerBase = Players();
+    const player1 = playerBase.playerX;
+    const player2 = playerBase.playerO;
 
     const gameTile = document.querySelectorAll('.tile');
-    const optionX = document.querySelector('.optionX');
-    const optionO = document.querySelector('.optionO');
-
-    optionX.onclick = () => {}
 
     gameTile.forEach((tile, index) => {
-        tile.addEventListener('click', () => updateDisplay(tile, getCurrentPlayer(), index));
+        tile.addEventListener('click', () => updateGame(tile, currentPlayer(), index));
     })
 
-    const getCurrentPlayer = () => {
-        if (round % 2 === 1) return player1.sign;
-        else return player2.sign;
+    function currentPlayer() {
+        return playerBase.currentPlayer(round, player1, player2);
     }
-    const updateDisplay = (tile, sign, index) => {
+
+    function updateGame(tile, sign, index) {
         tile.innerHTML = sign;
+        disableTile(tile);
+
         game.matrix[index] = sign;
-        round++;
         console.log(game.matrix);
+        round++;
+    }
+
+    function disableTile(tile) {
+        tile.replaceWith(tile.cloneNode(true));
     }
 }
 
-Display();
+Game();
