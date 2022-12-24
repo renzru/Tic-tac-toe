@@ -37,16 +37,12 @@ const Players = () => {
 }
 
 const Game = () => {
-    const board = Board();
-    const playerBase = Players();
+    let board = Board();
+    let playerBase = Players();
     const gameTile = document.querySelectorAll('.tile');
 
     let boardArray = board.board;
     let round = 1;
-
-    gameTile.forEach((tile, index) => {
-        tile.addEventListener('click', () => playRound(tile, currentPlayer(), index));
-    })
 
     function currentPlayer() {
         return playerBase.currentPlayer(round);
@@ -58,8 +54,34 @@ const Game = () => {
         disableTile(tile);
 
         if (round >= 3) checkWin(board, boardArray, playerBase);
-        if (isDraw()) console.log('Draw!');
+        if (isDraw()) {
+            setTimeout(() => alert(`It's a Draw!`), 100);
+            setTimeout(() => Game().newGame(), 500);
+        }
+
         round++;
+    }
+
+    function newGame() {
+        board = Board();
+        playerBase = Players();
+        boardArray = board.board
+        round = 1;
+
+        resetTiles();
+        generateTiles();
+    }
+
+    function resetTiles() {
+        gameTile.forEach((tile) => {
+            tile.innerHTML = '';
+        });
+    }
+
+    function generateTiles() {
+        gameTile.forEach((tile, index) => {
+            tile.addEventListener('click', () => playRound(tile, currentPlayer(), index));
+        });
     }
 
     function isDraw() {
@@ -75,7 +97,7 @@ const Game = () => {
     }
 
     return {
-        playRound,
+        newGame,
         disableAllTiles
     }
 }
@@ -123,10 +145,11 @@ const checkWin = (board, boardArray, playerBase) => {
     }
 
     function announceWin(sign) {
-        console.log(`Player ${sign} Wins!`);
         Game().disableAllTiles();
         playerBase.hasWinner = true;
+        setTimeout(() => alert(`Player ${sign} Wins!`), 100);
+        setTimeout(() => Game().newGame(), 500);
     }
 }
 
-Game();
+Game().newGame();
