@@ -1,5 +1,5 @@
 const Board = () => {
-    const gameBoard = ['', '', '', '', '', '', '', '', ''];
+    const board = ['', '', '', '', '', '', '', '', ''];
 
     const toMatrix = (array, width) => {
         let matrix = [];
@@ -16,46 +16,32 @@ const Board = () => {
 
         return matrix;
     }
+
     return {
-        gameBoard,
+        board,
         toMatrix
     }
 }
 
-const getPlayer = (value, sign) => {
-    this.winner = false;
-
-    return {
-        value,
-        sign,
-        winner
-    }
-}
-
 const Players = () => {
-    const playerX = getPlayer(0, 'X');
-    const playerO = getPlayer(1, 'O');
+    this.hasWinner = false;
 
     function currentPlayer(round) {
-        return (round % 2 === 1) ? playerX : playerO;
+        return (round % 2 === 1) ? 'X' : 'O';
     }
 
     return {
-        playerX,
-        playerO,
-        currentPlayer,
+        hasWinner,
+        currentPlayer
     }
 }
 
 const Game = () => {
-    let game = Board();
-    let gameBoard = game.gameBoard;
+    let board = Board();
+    let boardArray = board.board;
     let round = 1;
 
     const playerBase = Players();
-    const playerX = playerBase.playerX;
-    const playerO = playerBase.playerO;
-
     const gameTile = document.querySelectorAll('.tile');
 
     gameTile.forEach((tile, index) => {
@@ -66,40 +52,78 @@ const Game = () => {
         return playerBase.currentPlayer(round);
     }
 
-    const playRound = (tile, player, index) => {
-        tile.innerHTML = player.sign;
-        gameBoard[index] = player.value;
+    const playRound = (tile, sign, index) => {
+        tile.innerHTML = sign;
+        boardArray[index] = sign;
         disableTile(tile);
 
-        if (round >= 3) checkWin();
-        if (round >= 9) console.log('Draw!');
+        if (round >= 3) checkWin(board, boardArray, playerBase);
+        console.log(playerBase.hasWinner);
+        if (round >= 9 && playerBase.hasWinner === false) console.log('Draw!');
         round++;
+    }
 
-        function checkWin() {
-            let gameMatrix = game.toMatrix(gameBoard, 3);
-            console.log(gameMatrix);
+    function disableTile(tile) {
+        tile.replaceWith(tile.cloneNode(true));
+    }
 
-            gameMatrix.forEach((row) => {
-                let value = row[0];
-                if (value !== 0 && value !== 1) return
-                if (row[1] === value && row[2] === value) {
-                    announceWin(currentPlayer().sign);
-                };
-            })
+    function disableAllTiles() {
+        gameTile.forEach((tile) => tile.replaceWith(tile.cloneNode(true)));
+    }
+
+    return {
+        playRound,
+        disableAllTiles
+    }
+}
+
+
+const checkWin = (board, boardArray, playerBase) => {
+    let boardMatrix = board.toMatrix(boardArray, 3);
+
+    checkRows();
+    checkColumns();
+    checkDiagonal();
+    checkAntiDiagonal();
+
+    function checkRows() {
+        boardMatrix.forEach((row) => {
+            let sign = row[0];
+            if (sign === '') return
+
+            if (row[1] === sign && row[2] === sign) announceWin(sign);
+        })
+    }
+
+    function checkColumns() {
+        for (let i = 0; i < 2; i++) {
+            let sign = boardMatrix[i][i];
+            if (sign === '') return
+
+            if (boardMatrix[0][i] === sign && boardMatrix[1][i] === sign && boardMatrix[2][i] === sign) announceWin(sign);
         }
+    }
 
-        function announceWin(winner) {
-            console.log(`Player ${winner} Wins!`)
-            disableAllTiles();
-        }
+    function checkDiagonal() {
+        let i = 0;
+        let sign = boardMatrix[0][0];
+        if (sign === '') return
 
-        function disableAllTiles() {
-            gameTile.forEach((tile) => tile.replaceWith(tile.cloneNode(true)));
-        }
+        if (boardMatrix[0][i] === sign && boardMatrix[1][i + 1] === sign && boardMatrix[2][i + 2] === sign) announceWin(sign);
+    }
 
-        function disableTile(tile) {
-            tile.replaceWith(tile.cloneNode(true));
-        }
+    function checkAntiDiagonal() {
+        let i = 0;
+        let sign = boardMatrix[0][2];
+        if (sign === '') return
+
+        if (boardMatrix[2][i] === sign && boardMatrix[1][i + 1] === sign && boardMatrix[0][i + 2] === sign) announceWin(sign);
+    }
+
+    function announceWin(sign) {
+        console.log(`Player ${sign} Wins!`);
+        Game().disableAllTiles();
+        playerBase.hasWinner = true;
     }
 }
 
