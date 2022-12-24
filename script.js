@@ -37,12 +37,12 @@ const Players = () => {
 }
 
 const Game = () => {
-    let board = Board();
-    let boardArray = board.board;
-    let round = 1;
-
+    const board = Board();
     const playerBase = Players();
     const gameTile = document.querySelectorAll('.tile');
+
+    let boardArray = board.board;
+    let round = 1;
 
     gameTile.forEach((tile, index) => {
         tile.addEventListener('click', () => playRound(tile, currentPlayer(), index));
@@ -58,9 +58,12 @@ const Game = () => {
         disableTile(tile);
 
         if (round >= 3) checkWin(board, boardArray, playerBase);
-        console.log(playerBase.hasWinner);
-        if (round >= 9 && playerBase.hasWinner === false) console.log('Draw!');
+        if (isDraw()) console.log('Draw!');
         round++;
+    }
+
+    function isDraw() {
+        return round >= 9 && playerBase.hasWinner === false;
     }
 
     function disableTile(tile) {
@@ -76,7 +79,6 @@ const Game = () => {
         disableAllTiles
     }
 }
-
 
 const checkWin = (board, boardArray, playerBase) => {
     let boardMatrix = board.toMatrix(boardArray, 3);
