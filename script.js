@@ -20,8 +20,8 @@ const Players = () => {
     const playerX = getPlayer(1, 'X');
     const playerO = getPlayer(2, 'O');
 
-    function currentPlayer(a, b, c) {
-        return (a % 2 === 1) ? b : c;
+    function currentPlayer(round) {
+        return (round % 2 === 1) ? playerX.sign : playerO.sign;
     }
 
     return {
@@ -38,7 +38,6 @@ const Game = () => {
     const playerX = playerBase.playerX;
     const playerO = playerBase.playerO;
 
-    console.log(playerX)
     const gameTile = document.querySelectorAll('.tile');
 
     gameTile.forEach((tile, index) => {
@@ -46,7 +45,7 @@ const Game = () => {
     })
 
     function currentPlayer() {
-        return playerBase.currentPlayer(round, playerX.sign, playerO.sign);
+        return playerBase.currentPlayer(round);
     }
 
     function updateGame(tile, sign, index) {
