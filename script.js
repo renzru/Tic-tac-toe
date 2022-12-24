@@ -1,27 +1,43 @@
 const Board = () => {
-    const matrix = ['', '', '', '', '', '', '', '', ''];
+    const gameBoard = ['', '', '', '', '', '', '', '', ''];
 
+    const toMatrix = (array, width) => {
+        let matrix = [];
+        let i, k;
+
+        for (i = 0, k = -1; i < array.length; i++) {
+            if (i % width === 0) {
+                k++;
+                matrix[k] = [];
+            }
+
+            matrix[k].push(array[i]);
+        }
+
+        return matrix;
+    }
     return {
-        matrix
+        gameBoard,
+        toMatrix
     }
 }
 
-const getPlayer = (player, sign) => {
-    this.win = false;
+const getPlayer = (value, sign) => {
+    this.winner = false;
 
     return {
-        player,
+        value,
         sign,
-        win
+        winner
     }
 }
 
 const Players = () => {
-    const playerX = getPlayer(1, 'X');
-    const playerO = getPlayer(2, 'O');
+    const playerX = getPlayer(0, 'X');
+    const playerO = getPlayer(1, 'O');
 
     function currentPlayer(round) {
-        return (round % 2 === 1) ? playerX.sign : playerO.sign;
+        return (round % 2 === 1) ? playerX : playerO;
     }
 
     return {
@@ -33,7 +49,9 @@ const Players = () => {
 
 const Game = () => {
     let game = Board();
+    let gameBoard = game.gameBoard;
     let round = 1;
+
     const playerBase = Players();
     const playerX = playerBase.playerX;
     const playerO = playerBase.playerO;
@@ -41,29 +59,47 @@ const Game = () => {
     const gameTile = document.querySelectorAll('.tile');
 
     gameTile.forEach((tile, index) => {
-        tile.addEventListener('click', () => updateGame(tile, currentPlayer(), index));
+        tile.addEventListener('click', () => playRound(tile, currentPlayer(), index));
     })
 
     function currentPlayer() {
         return playerBase.currentPlayer(round);
     }
 
-    function updateGame(tile, sign, index) {
-        tile.innerHTML = sign;
+    const playRound = (tile, player, index) => {
+        tile.innerHTML = player.sign;
+        gameBoard[index] = player.value;
         disableTile(tile);
 
-        game.matrix[index] = sign;
-        console.log(game.matrix);
+        if (round >= 3) checkWin();
+        if (round >= 9) console.log('Draw!');
         round++;
-        checkStatus();
-    }
 
-    function checkStatus() {
-        if (round > 9) console.log('Game Finished');
-    }
+        function checkWin() {
+            let gameMatrix = game.toMatrix(gameBoard, 3);
+            console.log(gameMatrix);
 
-    function disableTile(tile) {
-        tile.replaceWith(tile.cloneNode(true));
+            gameMatrix.forEach((row) => {
+                let value = row[0];
+                if (value !== 0 && value !== 1) return
+                if (row[1] === value && row[2] === value) {
+                    announceWin(currentPlayer().sign);
+                };
+            })
+        }
+
+        function announceWin(winner) {
+            console.log(`Player ${winner} Wins!`)
+            disableAllTiles();
+        }
+
+        function disableAllTiles() {
+            gameTile.forEach((tile) => tile.replaceWith(tile.cloneNode(true)));
+        }
+
+        function disableTile(tile) {
+            tile.replaceWith(tile.cloneNode(true));
+        }
     }
 }
 
