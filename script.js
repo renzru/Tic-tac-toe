@@ -6,20 +6,25 @@ const Board = () => {
     }
 }
 
+const getPlayer = (player, sign) => {
+    this.win = false;
+
+    return {
+        player,
+        sign,
+        win
+    }
+}
+
 const Players = () => {
-    const playerX = getSign('X');
-    const playerO = getSign('O');
+    const playerX = getPlayer(1, 'X');
+    const playerO = getPlayer(2, 'O');
 
     function currentPlayer(a, b, c) {
         return (a % 2 === 1) ? b : c;
     }
 
-    function getSign(sign) {
-        return sign;
-    }
-
     return {
-        getSign,
         playerX,
         playerO,
         currentPlayer,
@@ -30,9 +35,10 @@ const Game = () => {
     let game = Board();
     let round = 1;
     const playerBase = Players();
-    const player1 = playerBase.playerX;
-    const player2 = playerBase.playerO;
+    const playerX = playerBase.playerX;
+    const playerO = playerBase.playerO;
 
+    console.log(playerX)
     const gameTile = document.querySelectorAll('.tile');
 
     gameTile.forEach((tile, index) => {
@@ -40,7 +46,7 @@ const Game = () => {
     })
 
     function currentPlayer() {
-        return playerBase.currentPlayer(round, player1, player2);
+        return playerBase.currentPlayer(round, playerX.sign, playerO.sign);
     }
 
     function updateGame(tile, sign, index) {
@@ -50,6 +56,11 @@ const Game = () => {
         game.matrix[index] = sign;
         console.log(game.matrix);
         round++;
+        checkStatus();
+    }
+
+    function checkStatus() {
+        if (round > 9) console.log('Game Finished');
     }
 
     function disableTile(tile) {
